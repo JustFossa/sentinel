@@ -1,0 +1,91 @@
+{
+  "alert": {
+    "id": "INC-4471",
+    "service": "checkout-service",
+    "title": "checkout-service 5xx rate spiked to 47%",
+    "severity": "SEV1",
+    "fired_at": "2026-06-11T02:14:00Z",
+    "summary": "Customers cannot complete purchases. The checkout API is returning HTTP 500 on ~47% of requests (baseline 0.1%). Estimated business impact ~$7.4k/min in failed orders.",
+    "signals": {
+      "error_rate": "47% 5xx",
+      "baseline": "0.1% 5xx",
+      "affected_endpoint": "POST /api/checkout"
+    }
+  },
+  "telemetry": {
+    "exceptions": [
+      {
+        "type": "KeyError",
+        "message": "'tax_rate'",
+        "operation": "checkout.pricing.calculate_total",
+        "count": 1842,
+        "first_seen": "2026-06-11T02:11:30Z"
+      },
+      {
+        "type": "HTTPException",
+        "message": "500 Internal Server Error",
+        "operation": "POST /api/checkout",
+        "count": 1850,
+        "first_seen": "2026-06-11T02:11:31Z"
+      }
+    ],
+    "http_5xx": [
+      { "timestamp": "2026-06-11T02:09:00Z", "total": 2100, "errors": 2 },
+      { "timestamp": "2026-06-11T02:11:00Z", "total": 2050, "errors": 61 },
+      { "timestamp": "2026-06-11T02:13:00Z", "total": 2000, "errors": 940 }
+    ],
+    "dependencies": [
+      { "target": "payments-gateway", "calls": 1900, "failures": 0, "failure_rate": 0.0, "p95_ms": 180 },
+      { "target": "orders-db (Cosmos DB)", "calls": 4200, "failures": 0, "failure_rate": 0.0, "p95_ms": 24 },
+      { "target": "inventory-cache (Redis)", "calls": 3800, "failures": 0, "failure_rate": 0.0, "p95_ms": 3 }
+    ]
+  },
+  "metrics": {
+    "cpu_pct": 31,
+    "memory_pct": 44,
+    "oom_events": 0,
+    "pod_restarts": 0,
+    "db_connection_pct": 38
+  },
+  "config_changes": [],
+  "deploys": [
+    {
+      "sha": "a3f9c21d8e4b7f2a16c0d9e8b5a4c3f2e1d0b9a8",
+      "message": "refactor: simplify tax calculation",
+      "author": "dev-jordan",
+      "merged_at": "2026-06-11T02:08:00Z",
+      "deployed_at": "2026-06-11T02:10:00Z",
+      "files_changed": ["checkout/pricing.py"],
+      "diff_summary": "Removed the `.get('tax_rate', DEFAULT_TAX)` fallback in calculate_total(); the code now indexes item['tax_rate'] directly, which raises KeyError for any cart item lacking a tax category."
+    },
+    {
+      "sha": "b1c4e90a2f7d3c6b8e5a1f0d9c4b7a2e6f3d8c1a",
+      "message": "docs: update README badges",
+      "author": "dev-sam",
+      "merged_at": "2026-06-11T01:50:00Z",
+      "deployed_at": "2026-06-11T01:55:00Z",
+      "files_changed": ["README.md"],
+      "diff_summary": "Documentation only; no runtime code touched."
+    },
+    {
+      "sha": "c7d2f5519b8a4e3c2d1f0a9b8c7d6e5f4a3b2c1d",
+      "message": "style: tweak checkout button color",
+      "author": "dev-lee",
+      "merged_at": "2026-06-11T01:30:00Z",
+      "deployed_at": "2026-06-11T01:40:00Z",
+      "files_changed": ["web/checkout.css"],
+      "diff_summary": "Front-end CSS only; no server code touched."
+    }
+  ],
+  "runbooks": [
+    {
+      "service": "checkout-service",
+      "symptom": "5xx spike",
+      "steps": [
+        "Check deploys in the last 2 hours",
+        "If error onset aligns with a deploy, roll it back",
+        "Verify payment gateway and database health"
+      ]
+    }
+  ]
+}

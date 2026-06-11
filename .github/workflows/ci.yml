@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  reasoning-tests:
+    name: Reasoning engine (mock mode)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Mock mode runs on the standard library only — no install needed.
+      - name: Run end-to-end reasoning tests
+        run: PYTHONPATH=src python tests/test_pipeline.py
+
+      - name: Smoke test — checkout incident (bad deploy)
+        run: PYTHONPATH=src python -m sentinel --scenario checkout_500 --out out/checkout.md
+
+      - name: Smoke test — api latency incident (infra)
+        run: PYTHONPATH=src python -m sentinel --scenario api_latency_infra --out out/api.md
+
+      - name: Assert postmortems were generated
+        run: |
+          test -s out/checkout.md && echo "checkout postmortem OK"
+          test -s out/api.md && echo "api postmortem OK"
+          grep -q "a3f9c21" out/checkout.md && echo "root cause commit present"
+
+      - name: Upload postmortems
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: postmortems-py${{ matrix.python-version }}
+          path: out/*.md
+
+  lint:
+    name: Byte-compile check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile all sources
+        run: python -m compileall -q src tests sample_app

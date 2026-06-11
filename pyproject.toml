@@ -1,0 +1,32 @@
+[project]
+name = "sentinel-rca"
+version = "0.1.0"
+description = "Sentinel — an autonomous incident root-cause reasoning agent built on Microsoft Agent Framework + Foundry"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "JustFossa" }]
+license = { text = "MIT" }
+dependencies = []
+
+[project.optional-dependencies]
+# Everything needed for LIVE mode (Foundry + Azure MCP + GitHub MCP).
+# Mock mode (the demo) needs none of these — it runs on the stdlib.
+live = [
+    "agent-framework>=1.0.0",
+    "openai>=1.40.0",
+    "azure-identity>=1.17.0",
+    "mcp>=1.2.0",
+    "opentelemetry-api>=1.25.0",
+    "opentelemetry-sdk>=1.25.0",
+    "rich>=13.7.0",
+]
+
+[project.scripts]
+sentinel = "sentinel.main:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Architecture & design
+    url: https://github.com/JustFossa/sentinel/blob/main/ARCHITECTURE.md
+    about: How the multi-agent reasoning workflow is composed.
+  - name: Demo script
+    url: https://github.com/JustFossa/sentinel/blob/main/DEMO_SCRIPT.md
+    about: 2-minute walkthrough of Sentinel reasoning through an incident.

@@ -1,0 +1,20 @@
+# --- Core (required only for LIVE mode; mock mode needs nothing here) ---
+# Microsoft Agent Framework 1.0 (GA April 2026) — multi-agent orchestration
+agent-framework>=1.0.0
+
+# Azure AI Foundry / Azure OpenAI client used as the reasoning model backend
+openai>=1.40.0
+azure-identity>=1.17.0
+
+# Model Context Protocol client (Azure MCP + GitHub MCP)
+mcp>=1.2.0
+
+# Observability — every model call / tool hop / handoff flows through OpenTelemetry
+opentelemetry-api>=1.25.0
+opentelemetry-sdk>=1.25.0
+
+# Pretty terminal output for the live reasoning trace
+rich>=13.7.0
+
+# Sample app used in the demo (breaks on cue)
+flask>=3.0.0

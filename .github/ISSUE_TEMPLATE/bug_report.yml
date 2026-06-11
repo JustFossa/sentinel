@@ -1,0 +1,42 @@
+name: Bug report
+description: Something in Sentinel's reasoning or tooling didn't work as expected
+title: "[bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for filing a report. Please include enough to reproduce.
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options:
+        - mock (offline demo)
+        - live (Foundry + MCP)
+    validations:
+      required: true
+  - type: input
+    id: scenario
+    attributes:
+      label: Scenario / command
+      placeholder: "python -m sentinel --scenario checkout_500"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened (paste the trace / error)
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Python version
+      placeholder: "3.12"
