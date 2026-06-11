@@ -17,4 +17,4 @@ opentelemetry-sdk>=1.25.0
 rich>=13.7.0
 
 # Sample app used in the demo (breaks on cue)
-flask>=3.0.0
+flask>=3.1.3
